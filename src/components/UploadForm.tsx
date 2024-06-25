@@ -1,3 +1,5 @@
+import { LinearProgress } from '@mui/material';
+import { AxiosError } from 'axios';
 import * as React from 'react';
 import { useState } from 'react';
 import { axiosInstance } from '../axios/axiosInstance';
@@ -9,6 +11,8 @@ interface IUploadFormProps {
 const UploadForm: React.FunctionComponent<IUploadFormProps> = () => {
     const [selectedFile, setSelectedFile] = useState<string | Blob>('');
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [uploadText, setUploadText] = useState('')
 
     const handleFileChange = (event: any) => {
         setSelectedFile(event.target.files[0]);
@@ -23,11 +27,30 @@ const UploadForm: React.FunctionComponent<IUploadFormProps> = () => {
             formData, 
             {
                 timeout: 0,
+                onUploadProgress(progressEvent) {
+                    setProgress(Number(progressEvent.progress?.toFixed(2)) * 100)
+                },
             }
-        )
-        if (response.status === 201) {
+        ).catch((err: AxiosError) => {
+            if (err.response?.status === 413) {
+                setUploadSuccess(true)
+                setUploadText('Файл слишком большой!')
+                setSelectedFile('')
+                setProgress(0)
+            } else {
+                setUploadSuccess(true)
+                setUploadText('Опаньки... Что-то пошло не так(')
+                setSelectedFile('')
+                setProgress(0)
+            }
+        })
+        
+        if (response?.status === 201 || response?.status === 200) {
             setUploadSuccess(true)
+            setUploadText('Файл успешно загружен!')
             setSelectedFile('')
+            setProgress(0)
+            event.target.reset();
         }
     };
 
@@ -38,9 +61,10 @@ const UploadForm: React.FunctionComponent<IUploadFormProps> = () => {
                 <input type="file" name="file" onChange={handleFileChange}/>
                 <span className="input-file-btn"></span>           
             </label>
-            <button type='submit'>Загрузить файл</button>
-            {uploadSuccess && <p>File uploaded successfully!</p>}
+            <button type='submit'>Загрузить файл (до 10Гб)</button>
+            {uploadSuccess && <p>{uploadText}</p>}
         </form>
+        <LinearProgress variant='determinate' value={progress}/>
     </div>
   );
 };
