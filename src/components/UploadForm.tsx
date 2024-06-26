@@ -61,10 +61,10 @@ const UploadForm: React.FunctionComponent<IUploadFormProps> = () => {
                 <input type="file" name="file" onChange={handleFileChange}/>
                 <span className="input-file-btn"></span>           
             </label>
-            <button type='submit'>Загрузить файл (до 10Гб)</button>
+            <button type='submit'>Загрузить файл (до 10 Гб)</button>
             {uploadSuccess && <p>{uploadText}</p>}
         </form>
-        <LinearProgress variant='determinate' value={progress}/>
+        <LinearProgress variant='determinate' value={progress} />
     </div>
   );
 };

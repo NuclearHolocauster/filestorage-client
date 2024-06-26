@@ -28,8 +28,10 @@ const FileTable: FunctionComponent<IFileTableProps> = () => {
         <div>
             <ul>
                 {files.map((file, index) => (
-                    <li key={index}>
-                        <a href={`${backend.baseUrl}${file.link}`} download>{file.fileName} </a>
+                    <li key={index} style={{ textAlign: 'left' }}>
+                        <a href={`${backend.baseUrl}${file.link}`} download>
+                        {file.fileName.length > 40 ? `${file.fileName.substring(0, 40)}...` : file.fileName}
+                        </a>
                     </li>
                 ))}
             </ul>
